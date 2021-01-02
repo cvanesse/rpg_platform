@@ -1,0 +1,2 @@
+
+public class MoveBar : Bar { }
