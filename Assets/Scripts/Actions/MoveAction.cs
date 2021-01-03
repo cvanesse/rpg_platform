@@ -32,6 +32,7 @@ public class MoveAction : Action
         // Add a linerenderer object to the GameObject and set it up appropriately.
         InitLineRenderer();
 
+        // Add a UI ghost for the destination.
         InitUIGhost();
 
         // Start the movement feedback GUI
@@ -77,7 +78,7 @@ public class MoveAction : Action
     private void InitUIGhost()
     {
         // Create the UI Ghost game object
-        Object ghost_prefab = Resources.Load("UI_Ghost");
+        Object ghost_prefab = Resources.Load("Prefabs/UI_Ghost");
         ghost = AddChildObject(ghost_prefab);
 
         // Set the actor of the ghost
@@ -101,7 +102,7 @@ public class MoveAction : Action
     {
         isMoving = true;
         ghost.SetActive(true);
-        Cursor.visible = false;
+        //Cursor.visible = false;
         lineRend.endColor = Color.white;
     }
 
@@ -110,7 +111,7 @@ public class MoveAction : Action
     {
         isMoving = false;
         ghost.SetActive(false);
-        Cursor.visible = true;
+        //Cursor.visible = true;
         lineRend.endColor = Color.clear;
         actor.stamina.dx = 0;
     }

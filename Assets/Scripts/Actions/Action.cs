@@ -1,6 +1,4 @@
 using UnityEngine;
-using System;
-using System.Linq;
 using System.Collections.Generic;
 
 // The action class handles creation and annihilation of components which can be created by an action

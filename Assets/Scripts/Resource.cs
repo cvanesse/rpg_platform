@@ -1,8 +1,4 @@
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine.UI;
 
 // A placeholder class for an actor resource (for stamina, mana, ammo, etc...)
 public class Resource
@@ -19,7 +15,7 @@ public class ContinuousResource : Resource
 
     public override GameObject GetGUIObject()
     {
-        var guiObj = (GameObject)AssetDatabase.LoadAssetAtPath("Assets/Prefabs/MoveBar.prefab", typeof(GameObject));
+        var guiObj = (GameObject)Resources.Load("Prefabs/MoveBar");
         return guiObj;
     }
 }
