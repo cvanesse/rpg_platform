@@ -6826,6 +6826,7 @@ GameObject:
   - component: {fileID: 269819813}
   - component: {fileID: 269819810}
   - component: {fileID: 269819814}
+  - component: {fileID: 269819815}
   m_Layer: 10
   m_Name: jeff
   m_TagString: Untagged
@@ -6950,6 +6951,27 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.48134178, y: 0.7049279}
   m_EdgeRadius: 0
+--- !u!50 &269819815
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 269819809}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &269902573
 GameObject:
   m_ObjectHideFlags: 0
@@ -11920,6 +11942,7 @@ GameObject:
   - component: {fileID: 407827255}
   - component: {fileID: 407827251}
   - component: {fileID: 407827254}
+  - component: {fileID: 407827256}
   m_Layer: 11
   m_Name: fred
   m_TagString: Untagged
@@ -12049,6 +12072,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+--- !u!50 &407827256
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 407827250}
+  m_BodyType: 2
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &411886349
 GameObject:
   m_ObjectHideFlags: 0

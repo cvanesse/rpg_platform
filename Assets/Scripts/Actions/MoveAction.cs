@@ -25,12 +25,17 @@ public class MoveAction : Action
 
     private MoveBar moveBar;
 
+    // The participant's collider
+    Rigidbody2D participantCollider;
+
     public override void Start()
     {
         base.Start();
 
         // Get the current participant location
         UpdateParticipantPos();
+
+        participantCollider = gameObject.GetComponent<Rigidbody2D>();
 
         // Load the speed from the participant's stat component
         //movement = gameObject.GetComponent<Stats>().speed;
@@ -120,22 +125,28 @@ public class MoveAction : Action
         float max_distance = Vector3.Distance(mousePos, participantPos); // Maximum distance is from the mouse to the participant.
 
         // Check for collisions in the wall or participant layers on that ray
-        RaycastHit2D[] hits = Physics2D.RaycastAll(origin, direction, max_distance);
+        RaycastHit2D[] hits = new RaycastHit2D[10];// = Physics2D.RaycastAll(origin, direction, max_distance);
+
+        // collider cast the player collider
+        int numHits = participantCollider.Cast(direction, hits, max_distance);
 
         // TODO: Integrate movement modifiers from different floor tiles along the ray
 
         // Determine the maximum move distance in the direction of the mouse.
         float move_dist = max_distance;
-        if (hits.Length > 0)
+
+        float d_move = 0.1f; // TODO: Find a better solution than this.
+
+        if (numHits > 0)
         {
             // Find the closest hit
             Transform closest_object = hits[0].transform;
             float collision_dist = hits[0].distance;
 
             // If there is more than 1 hit, loop through the rest and determine the closest one to the participant.
-            if (hits.Length > 1)
+            if (numHits > 1)
             {
-                for (int hid = 1; hid < hits.Length; hid++)
+                for (int hid = 1; hid < numHits; hid++)
                 {
                     RaycastHit2D hit = hits[hid];
 
@@ -149,7 +160,7 @@ public class MoveAction : Action
             }
 
             // Update the move distance based on the collision distance
-            move_dist = collision_dist;
+            move_dist = collision_dist - d_move;
         }
 
         // collision_dist stores the distance to the nearest collision
