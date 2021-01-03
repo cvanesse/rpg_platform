@@ -113,12 +113,54 @@ public class MoveAction : Action
     // Finds the movement destination based on mouse position
     private Vector3 FindMovePos(Vector3 mousePos)
     {
-        // Return the mouse position if it's a valid move.
-        if (IsValidMove(mousePos)) { return mousePos; }
+        // Create a ray pointing from the participant to the mouse
+        Vector2 origin = (Vector2)participantPos;
+        Vector2 direction = (Vector2)Vector3.Normalize(mousePos - participantPos);
 
-        // Check for the furthest valid position along the mouse line
-        Vector3 move = GetStamina() * Vector3.Normalize(mousePos - participantPos);
-        return participantPos + move;
+        float max_distance = Vector3.Distance(mousePos, participantPos); // Maximum distance is from the mouse to the participant.
+
+        // Check for collisions in the wall or participant layers on that ray
+        RaycastHit2D[] hits = Physics2D.RaycastAll(origin, direction, max_distance);
+
+        // TODO: Integrate movement modifiers from different floor tiles along the ray
+
+        // Determine the maximum move distance in the direction of the mouse.
+        float move_dist = max_distance;
+        if (hits.Length > 0)
+        {
+            // Find the closest hit
+            Transform closest_object = hits[0].transform;
+            float collision_dist = hits[0].distance;
+
+            // If there is more than 1 hit, loop through the rest and determine the closest one to the participant.
+            if (hits.Length > 1)
+            {
+                for (int hid = 1; hid < hits.Length; hid++)
+                {
+                    RaycastHit2D hit = hits[hid];
+
+                    float hit_dist = hit.distance;
+                    if (hit_dist < collision_dist)
+                    {
+                        closest_object = hit.transform;
+                        collision_dist = hit_dist;
+                    }
+                }
+            }
+
+            // Update the move distance based on the collision distance
+            move_dist = collision_dist;
+        }
+
+        // collision_dist stores the distance to the nearest collision
+        if (move_dist > GetStamina())
+        {
+            move_dist = GetStamina();
+        }
+
+        Vector3 destination = participantPos + (Vector3)direction * move_dist;
+
+        return destination;
     }
 
     private float GetStamina()
