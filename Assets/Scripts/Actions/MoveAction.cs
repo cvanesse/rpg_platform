@@ -1,69 +1,66 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 // The mover behavior is intended to be added to an object when the player decides to move the character
 // (Ie - takes the move action)
-// When instantiated, a GUI element showing how much movement is available should be displayed,
-// And the moving process should begin.
-// 'isMoving' is true when the player is moving, when it is false - the player can do other things while this component tracks the movement
-// that they have left.
 public class MoveAction : Action
 {
-    private const float lineWidth = 0.1f;
-
     private LineRenderer lineRend; // The linerendering object for showing the player -> mouseptr line.
 
-    private bool isMoving; // True when we should have the player -> mouseptr line drawn and distance displaying
+    // True when we should have the movement UI active.
+    private bool isMoving;
 
-    //private float movement; // Float for tracking the amount of movement available to the mover.
-
-    private Vector3 mousePos; // For storing the current mouse posiion. The other vertex of the line will be the center of the mover object.
-
-    private Vector3 participantPos;
-
-    private MoveBar moveBar;
+    // The mouse and participant locations.
+    private Vector2 mousePos;
+    private Vector2 participantPos;
 
     // The participant's collider
-    Rigidbody2D participantCollider;
+    private Rigidbody2D participantCollider;
+
+    // A reference to the participant behaviour
+    private ActorParticipant actor;
 
     public override void Start()
     {
         base.Start();
 
         // Get the current participant location
-        UpdateParticipantPos();
-
+        participantPos = (Vector2)transform.position;
         participantCollider = gameObject.GetComponent<Rigidbody2D>();
-
-        // Load the speed from the participant's stat component
-        //movement = gameObject.GetComponent<Stats>().speed;
+        actor = gameObject.GetComponent<ActorParticipant>();
 
         // Add a linerenderer object to the GameObject and set it up appropriately.
         InitLineRenderer();
-
-        // Initialize the movement bar using the current stats
-        InitBar();
 
         // Start the movement feedback GUI
         StartMoving();
     }
 
-    // Initializes the movement bar for showing the user their remaining movement.
-    private void InitBar()
+    public void Update()
     {
-        //moveBar = FindObjectOfType<MoveBar>();
-        //moveBar.valMax = movement;
-        UpdateBar();
-    }
+        // If we're currently listening to user input
+        if (isMoving)
+        {
+            // Get the current mouse position
+            mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-    // Updates the movement bar.
-    private void UpdateBar()
-    {
-        //moveBar.val = movement;
-        //moveBar.dx = 0;
-        //moveBar.updateBar();
+            // Get the appropriate move position and update the GUI based on it.
+            Vector2 movePos = FindMovePos(mousePos);
+
+            lineRend.SetPosition(1, movePos);
+            actor.stamina.dx = Vector2.Distance(movePos, participantPos);
+
+            // Is the user right-clicks, or presses escape, then cancel the movement.
+            if (Input.GetKeyDown("escape") || Input.GetMouseButtonDown(1))
+            {
+                StopMoving();
+            }
+
+            // Left click moves the participant to the new location
+            if (Input.GetMouseButton(0))
+            {
+                MoveParticipant(movePos);
+            }
+        }
     }
 
     // Initializes the line renderer for movement feedback.
@@ -71,58 +68,36 @@ public class MoveAction : Action
     {
         lineRend = AddChildBehaviour<LineRenderer>();
         lineRend.material = new Material(Shader.Find("Sprites/Default"));
-        lineRend.startWidth = lineWidth;
+        lineRend.startWidth = 0.1f;
         lineRend.startColor = Color.clear;
-        lineRend.endColor = Color.clear;
         lineRend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         lineRend.sortingLayerName = "UI_front";
         lineRend.SetPosition(0, participantPos);
-    }
-
-
-    // Sets the color of the movement feedback line.
-    private void SetLineColor(Color C)
-    {
-        lineRend.endColor = C;
     }
 
     // Start the movement GUI and updates.
     public void StartMoving()
     {
         isMoving = true;
-        SetLineColor(Color.white);
+        lineRend.endColor = Color.white;
     }
 
     // Stop the movement GUI and updates.
     private void StopMoving()
     {
         isMoving = false;
-        SetLineColor(Color.clear);
-        gameObject.GetComponent<ActorParticipant>().stamina.dx = 0;
-        //UpdateBar();
-    }
-
-    // Gets the distance between a destination and the participant.
-    private float GetDistance(Vector3 destination)
-    {
-        destination.z = 0;
-        return Vector3.Distance(destination, participantPos);
-    }
-
-    // Returns true if a movement is valid, false otherwise
-    private bool IsValidMove(Vector3 destination)
-    {
-        return (GetDistance(destination) <= GetStamina());
+        lineRend.endColor = Color.white;
+        actor.stamina.dx = 0;
     }
 
     // Finds the movement destination based on mouse position
-    private Vector3 FindMovePos(Vector3 mousePos)
+    private Vector2 FindMovePos(Vector2 mousePos)
     {
         // Create a ray pointing from the participant to the mouse
-        Vector2 origin = (Vector2)participantPos;
-        Vector2 direction = (Vector2)Vector3.Normalize(mousePos - participantPos);
+        Vector2 direction = mousePos - participantPos;
+        direction.Normalize();
 
-        float max_distance = Vector3.Distance(mousePos, participantPos); // Maximum distance is from the mouse to the participant.
+        float max_distance = Vector2.Distance(mousePos, participantPos); // Maximum distance is from the mouse to the participant.
 
         // Check for collisions in the wall or participant layers on that ray
         RaycastHit2D[] hits = new RaycastHit2D[10];// = Physics2D.RaycastAll(origin, direction, max_distance);
@@ -164,69 +139,25 @@ public class MoveAction : Action
         }
 
         // collision_dist stores the distance to the nearest collision
-        if (move_dist > GetStamina())
+        if (move_dist > actor.stamina.val)
         {
-            move_dist = GetStamina();
+            move_dist = actor.stamina.val;
         }
 
-        Vector3 destination = participantPos + (Vector3)direction * move_dist;
+        Vector2 destination = participantPos + direction * move_dist;
 
         return destination;
     }
 
-    private float GetStamina()
-    {
-        return gameObject.GetComponent<ActorParticipant>().stamina.val;
-    }
-
-    void Update()
-    {
-        // If we're currently listening to user input
-        if (isMoving)
-        {
-            // Get the current mouse position
-            mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mousePos.z = 0; // Needs to be set to 0 since unity works in 3D.
-
-            // Get the appropriate move position and update the GUI based on it.
-            Vector3 movePos = FindMovePos(mousePos);
-
-            lineRend.SetPosition(1, movePos);
-            //moveBar.dx = GetDistance(movePos);
-            gameObject.GetComponent<ActorParticipant>().stamina.dx = GetDistance(movePos);
-            //moveBar.updateBar();
-
-            // Is the user right-clicks, or presses escape, then cancel the movement.
-            if (Input.GetKeyDown("escape") || Input.GetMouseButtonDown(1))
-            {
-                StopMoving();
-            }
-
-            // Left click moves the participant to the new location
-            if (Input.GetMouseButton(0) && IsValidMove(movePos))
-            {
-                MoveParticipant(movePos);
-            }
-        }
-    }
-
-    // For updating the participantPos variable.
-    private void UpdateParticipantPos()
-    {
-        participantPos = transform.position;
-        participantPos.z = 0;
-    }
-
     // Moves the participant to a new location.
-    private void MoveParticipant(Vector3 movePos)
+    private void MoveParticipant(Vector2 destination)
     {
-        transform.position = transform.position + (movePos - participantPos);
-        gameObject.GetComponent<ActorParticipant>().stamina.val = GetStamina() - Vector3.Distance(movePos, participantPos);
-        gameObject.GetComponent<ActorParticipant>().stamina.dx = 0;
-        UpdateParticipantPos();
+        transform.position = destination;
+        actor.stamina.val = actor.stamina.val - Vector3.Distance(destination, participantPos);
+        actor.stamina.dx = 0;
+        participantPos = (Vector2)transform.position;
         lineRend.SetPosition(0, participantPos);
 
-        //UpdateBar();
         StopMoving();
     }
 
