@@ -5,6 +5,7 @@ using UnityEngine;
 public class MoveAction : Action
 {
     private LineRenderer lineRend; // The linerendering object for showing the player -> mouseptr line.
+    private GameObject ghost; // The UI Ghost for showing player destination.
 
     // True when we should have the movement UI active.
     private bool isMoving;
@@ -31,6 +32,8 @@ public class MoveAction : Action
         // Add a linerenderer object to the GameObject and set it up appropriately.
         InitLineRenderer();
 
+        InitUIGhost();
+
         // Start the movement feedback GUI
         StartMoving();
     }
@@ -48,6 +51,7 @@ public class MoveAction : Action
 
             lineRend.SetPosition(1, movePos);
             actor.stamina.dx = Vector2.Distance(movePos, participantPos);
+            ghost.transform.position = movePos;
 
             // Is the user right-clicks, or presses escape, then cancel the movement.
             if (Input.GetKeyDown("escape") || Input.GetMouseButtonDown(1))
@@ -61,6 +65,23 @@ public class MoveAction : Action
                 MoveParticipant(movePos);
             }
         }
+    }
+
+    public override void OnDestroy()
+    {
+        StopMoving();
+        base.OnDestroy();
+    }
+
+    // Initialize a UI_ghost for placing at the destination
+    private void InitUIGhost()
+    {
+        // Create the UI Ghost game object
+        Object ghost_prefab = Resources.Load("UI_Ghost");
+        ghost = AddChildObject(ghost_prefab);
+
+        // Set the actor of the ghost
+        ghost.GetComponent<UI_ghost>().SetActor(actor);
     }
 
     // Initializes the line renderer for movement feedback.
@@ -79,6 +100,8 @@ public class MoveAction : Action
     public void StartMoving()
     {
         isMoving = true;
+        ghost.SetActive(true);
+        Cursor.visible = false;
         lineRend.endColor = Color.white;
     }
 
@@ -86,7 +109,9 @@ public class MoveAction : Action
     private void StopMoving()
     {
         isMoving = false;
-        lineRend.endColor = Color.white;
+        ghost.SetActive(false);
+        Cursor.visible = true;
+        lineRend.endColor = Color.clear;
         actor.stamina.dx = 0;
     }
 

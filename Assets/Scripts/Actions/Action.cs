@@ -28,10 +28,17 @@ public class Action : MonoBehaviour
         return compRef;
     }
 
+    protected GameObject AddChildObject(UnityEngine.Object obj)
+    {
+        var objRef = (GameObject)Instantiate(obj, gameObject.transform);
+        childObjects.Add(objRef);
+        return objRef;
+    }
+
     // Instantiate a new GameObject and keep track of it in the list of objects
     protected GameObject AddChildObject(GameObject obj)
     {
-        var objRef = Instantiate(obj);
+        var objRef = Instantiate(obj, gameObject.transform);
         childObjects.Add(objRef);
         return objRef;
     }
