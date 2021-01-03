@@ -13,10 +13,10 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - Floor
+  - Underfoot
+  - Wall
+  - Participant
   - 
   - 
   - 
@@ -40,6 +40,15 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Floor
+    uniqueID: 459175725
+    locked: 0
+  - name: Participant
+    uniqueID: 437210033
+    locked: 0
+  - name: Wall
+    uniqueID: 916812503
     locked: 0
   - name: UI_front
     uniqueID: 3013546775

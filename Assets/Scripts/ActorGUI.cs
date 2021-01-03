@@ -34,8 +34,6 @@ public class ActorGUI : MonoBehaviour
         {
             GameObject GUIObject = resource.GetGUIObject();
 
-            //GUIObject.GetComponent<ResourceGUI>().SetResource(resource);
-
             resourceGUIs.Add(Instantiate(GUIObject, Vector3.zero, Quaternion.identity, transform));
             resourceGUIs[resourceGUIs.Count - 1].GetComponent<ResourceGUI>().Init();
             resourceGUIs[resourceGUIs.Count - 1].GetComponent<ResourceGUI>().SetResource(resource);

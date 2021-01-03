@@ -70,6 +70,7 @@ public class MoveAction : Action
         lineRend.startColor = Color.clear;
         lineRend.endColor = Color.clear;
         lineRend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        lineRend.sortingLayerName = "UI_front";
         lineRend.SetPosition(0, participantPos);
     }
 
@@ -96,17 +97,17 @@ public class MoveAction : Action
         //UpdateBar();
     }
 
-    // Returns true if a movement is valid, false otherwise
-    private bool IsValidMove(Vector3 destination)
-    {
-        return (GetDistance(destination) <= GetStamina());
-    }
-
     // Gets the distance between a destination and the participant.
     private float GetDistance(Vector3 destination)
     {
         destination.z = 0;
         return Vector3.Distance(destination, participantPos);
+    }
+
+    // Returns true if a movement is valid, false otherwise
+    private bool IsValidMove(Vector3 destination)
+    {
+        return (GetDistance(destination) <= GetStamina());
     }
 
     // Finds the movement destination based on mouse position
