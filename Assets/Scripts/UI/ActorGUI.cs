@@ -5,18 +5,19 @@ using UnityEngine.UI;
 // Handles updating the ActorGUI based on the current Actor.
 public class ActorGUI : MonoBehaviour
 {
-
+    // For storing the current actor
     private ActorParticipant currentActor;
 
+    // Holds a list of resourceGUIs for updating them on every frame
     private List<GameObject> resourceGUIs;
 
-    private Text actorName;
+    // The nameplate of the actorName
+    private GameObject actorNameplate;
 
     // Start is called before the first frame update
     void Start()
     {
         resourceGUIs = new List<GameObject>();
-        actorName = gameObject.transform.Find("ActorName").GetComponent<Text>();
         ClearActor();
     }
 
@@ -27,7 +28,11 @@ public class ActorGUI : MonoBehaviour
         currentActor = actor;
 
         // Initialize the Actor GUI based on the input actor.
-        actorName.text = actor.participantName;
+        float height = 30f;
+        actorNameplate = UI_Constructors.AddTextObject(
+            actor.participantName, height, gameObject.transform, anchorTop: false
+        );
+        actorNameplate.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, height / 2 + 5);
 
         foreach (Resource resource in actor.GetResourceList())
         {
@@ -50,7 +55,7 @@ public class ActorGUI : MonoBehaviour
         currentActor = null;
 
         // Clear all children of the actor GUI
-        actorName.text = "";
+        Destroy(actorNameplate);
         foreach (GameObject resourceGUI in resourceGUIs)
         {
             Destroy(resourceGUI);

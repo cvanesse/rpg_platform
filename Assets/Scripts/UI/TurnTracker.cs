@@ -57,33 +57,10 @@ public class TurnTracker : MonoBehaviour
 
         // First, create and update the text gameobject
         // Instantiate and setup the participant nameplate
-        GameObject text_object = new GameObject(participant.name + "_nameplate");
-        Text nameplate = text_object.AddComponent<Text>();
+        GameObject text_object = UI_Constructors.AddTextObject(participant.name, nameheight,
+                        gameObject.transform, TextAnchor.MiddleLeft, participant.name + "_nameplate");
+        Text nameplate = text_object.GetComponent<Text>();
         RectTransform nameplate_tfm = text_object.GetComponent<RectTransform>();
-        {
-            // Setup the font of the nameplate
-            nameplate.font = Resources.GetBuiltinResource(typeof(Font), "Arial.ttf") as Font;
-            nameplate.text = participant.participantName;
-            nameplate.lineSpacing = 1;
-            nameplate.alignment = TextAnchor.MiddleLeft;
-            nameplate.alignByGeometry = true;
-            nameplate.resizeTextForBestFit = true;
-
-            // Setup the location of the nameplate.
-            nameplate_tfm.SetParent(transform);
-
-            // Set to stretch with canvas on L/R and anchor at top of canvas
-            nameplate_tfm.anchorMin = new Vector2(0, 1);
-            nameplate_tfm.anchorMax = new Vector2(1, 1);
-
-            // Zero out the scale and position
-            nameplate_tfm.localScale = new Vector3(1, 1, 1);
-
-            // Set nameplate transform location.
-            nameplate_tfm.sizeDelta = new Vector2(0, nameheight);
-            nameplate_tfm.offsetMin = new Vector2(0, nameplate_tfm.offsetMin.y);
-            nameplate_tfm.offsetMax = new Vector2(0, nameplate_tfm.offsetMax.y);
-        }
 
         // Add the participant to the turnorder
         participants.Add(participant);
