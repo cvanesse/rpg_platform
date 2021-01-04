@@ -9,9 +9,17 @@ public class ActorParticipant : Participant
     // Holds a list of actionComponents created on the turn so that they can be removed at the end of the turn.
     private List<Action> actions;
 
-    // Stamina information
-    public ConsumableContinuousResource stamina;
+    // Stamina and health information
+    public ContinuousResource stamina;
+    public Color staminaColor;
     public float maxStamina;
+    public float staminaBarX;
+    public float staminaBarY;
+    public ContinuousResource health;
+    public Color healthColor;
+    public float maxHealth;
+    public float healthBarX;
+    public float healthBarY;
 
     // Inheritance requires that we use the override keyword for extensions of base classes.
     public override void Start()
@@ -19,16 +27,15 @@ public class ActorParticipant : Participant
         base.Start();
         actions = new List<Action>();
 
-        stamina = new ConsumableContinuousResource();
-        stamina.resourceName = "Stamina";
-        stamina.val = maxStamina;
-        stamina.maxVal = maxStamina;
+        stamina = new ContinuousResource("Stamina", maxStamina, staminaColor, new Vector2(staminaBarX, staminaBarY));
+        health = new ContinuousResource("Health", maxHealth, healthColor, new Vector2(healthBarX, healthBarY));
     }
 
     public List<Resource> GetResourceList()
     {
         List<Resource> resources = new List<Resource>();
         resources.Add(stamina);
+        resources.Add(health);
         return resources;
     }
 

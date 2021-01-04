@@ -33,11 +33,13 @@ public class ActorGUI : MonoBehaviour
         {
             GameObject GUIObject = resource.GetGUIObject();
 
-            resourceGUIs.Add(Instantiate(GUIObject, Vector3.zero, Quaternion.identity, transform));
-            resourceGUIs[resourceGUIs.Count - 1].GetComponent<ResourceGUI>().Init();
-            resourceGUIs[resourceGUIs.Count - 1].GetComponent<ResourceGUI>().SetResource(resource);
+            GUIObject = Instantiate(GUIObject, Vector3.zero, Quaternion.identity, transform);
 
-            GUIObject.GetComponent<ResourceGUI>().UpdateResourceGUI();
+            GUIObject.GetComponent<ResourceGUIInterface>().Init();
+            GUIObject.GetComponent<ResourceGUIInterface>().SetResource(resource);
+            GUIObject.GetComponent<ResourceGUIInterface>().UpdateResourceGUI();
+
+            resourceGUIs.Add(GUIObject);
         }
     }
 
@@ -64,7 +66,7 @@ public class ActorGUI : MonoBehaviour
             // Tell every resource GUI to update.
             foreach (GameObject resourceGUI in resourceGUIs)
             {
-                resourceGUI.GetComponent<ResourceGUI>().UpdateResourceGUI();
+                resourceGUI.GetComponent<ResourceGUIInterface>().UpdateResourceGUI();
             }
         }
     }

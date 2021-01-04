@@ -1,18 +1,25 @@
 using UnityEngine;
 
-
-public class ResourceGUI : MonoBehaviour
+// Interface for generally communiating with ResourceGUIs
+public interface ResourceGUIInterface
 {
+    void SetResource(Resource resource);
+    void Init();
+    void UpdateResourceGUI();
+}
 
+// Resource GUIs must be defined in conjunction with a ResourceType.
+public class ResourceGUI<ResourceType> : MonoBehaviour, ResourceGUIInterface where ResourceType : Resource
+{
     // The resource that the GUI is linked to.
-    protected Resource resource;
+    protected ResourceType resource;
 
     public virtual void Init() { }
 
     public void SetResource(Resource newResource)
     {
         gameObject.SetActive(true);
-        resource = newResource;
+        resource = (ResourceType)newResource; // Cast to ResourceType on storage.
         InitResourceGUI();
     }
 

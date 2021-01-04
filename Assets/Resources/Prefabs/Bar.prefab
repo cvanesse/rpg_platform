@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 5441782315415816711}
   - component: {fileID: 5441782315415816710}
   - component: {fileID: 5441782315415816729}
-  - component: {fileID: 5441782315415816728}
+  - component: {fileID: 2504638464718662724}
   m_Layer: 5
-  m_Name: MoveBar
+  m_Name: Bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -102,7 +102,7 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
---- !u!114 &5441782315415816728
+--- !u!114 &2504638464718662724
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -111,12 +111,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 5441782315415816730}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b1ad2a7b1deaaa48802c2f2807033fb, type: 3}
+  m_Script: {fileID: 11500000, guid: 79e643dd97ea7db479be4c48c91506c6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  val: 0
-  valMax: 0
-  dx: 0
+  barPos: {x: 0, y: 0}
 --- !u!1 &5441782315869639997
 GameObject:
   m_ObjectHideFlags: 0
@@ -344,7 +342,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 1
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -405,7 +403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_Color: {r: 0.5754717, g: 0.3252811, b: 0.2035867, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
@@ -479,8 +477,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.6981132, g: 0.5849731, b: 0.53017086, a: 1}
+  m_Material: {fileID: 2100000, guid: 16e94b2897b028c43870154c349760a9, type: 2}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -642,7 +640,7 @@ MonoBehaviour:
   m_MinValue: 0
   m_MaxValue: 1
   m_WholeNumbers: 0
-  m_Value: 1
+  m_Value: 0
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []

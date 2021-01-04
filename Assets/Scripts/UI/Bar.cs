@@ -2,38 +2,24 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // The behavior for a basic bar
-public class Bar : ResourceGUI
+public class Bar : ResourceGUI<ContinuousResource>
 {
-    public float val;
-    public float valMax;
-
-    public float dx;
-
-    private GameObject fill;
-    private GameObject dx_bar;
-
     private Slider fillSlider;
     private Slider dxSlider;
 
+    public Vector2 barPos;
+
     public override void Init()
     {
-        gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector3(-27, 96, 0);
-        fill = gameObject.transform.Find("Fill").gameObject;
-        dx_bar = gameObject.transform.Find("Using").gameObject;
-
+        GameObject fill = gameObject.transform.Find("Fill").gameObject;
+        GameObject dx_bar = gameObject.transform.Find("Using").gameObject;
         dxSlider = dx_bar.GetComponent<Slider>();
         fillSlider = fill.GetComponent<Slider>();
 
+        gameObject.GetComponent<RectTransform>().anchoredPosition = barPos;
+
         resource = null;
 
-        UpdateResourceGUI();
-    }
-
-    protected override void InitResourceGUI()
-    {
-        val = ((ConsumableContinuousResource)resource).val;
-        valMax = ((ConsumableContinuousResource)resource).maxVal;
-        dx = ((ConsumableContinuousResource)resource).dx;
         UpdateResourceGUI();
     }
 
@@ -43,11 +29,8 @@ public class Bar : ResourceGUI
 
         if (resource != null)
         {
-            dx = ((ConsumableContinuousResource)resource).dx;
-            val = ((ConsumableContinuousResource)resource).val;
-            dxSlider.value = dx / valMax;
-            fillSlider.value = val / valMax;
-
+            dxSlider.value = resource.dx / resource.maxVal;
+            fillSlider.value = resource.val / resource.maxVal;
         }
     }
 }

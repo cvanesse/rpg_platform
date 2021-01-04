@@ -6,6 +6,8 @@ using System.Collections;
 public class CombatSystem : MonoBehaviour
 {
 
+    public GameObject GUICanvas;
+
     public GameObject turnTrackerObject;
     public int turnTrackerX;
     public int turnTrackerY;
@@ -16,24 +18,21 @@ public class CombatSystem : MonoBehaviour
 
     public void Start()
     {
-        createActorGUI();
+        AddNewUIElement(actorGUIObject, new Vector2(actorGUIX, actorGUIY));
 
         StartCoroutine("StartTurnTracker");
     }
 
-    private void createActorGUI()
+    private void AddNewUIElement(GameObject obj, Vector2 position)
     {
-        var guitf = FindObjectOfType<GUICanvas>().transform;
-        actorGUIObject = Instantiate(actorGUIObject, Vector3.zero, Quaternion.identity, guitf);
-        actorGUIObject.GetComponent<RectTransform>().anchoredPosition = new Vector3(actorGUIX, actorGUIY, 0);
+        obj = Instantiate(obj, Vector3.zero, Quaternion.identity, GUICanvas.transform);
+        obj.GetComponent<RectTransform>().anchoredPosition = (Vector3)position;
     }
 
     // Creates and Starts the TurnTracker
     private IEnumerator StartTurnTracker()
     {
-        var guitf = FindObjectOfType<GUICanvas>().transform;
-        turnTrackerObject = Instantiate(turnTrackerObject, Vector3.zero, Quaternion.identity, guitf);
-        turnTrackerObject.GetComponent<RectTransform>().anchoredPosition = new Vector3(turnTrackerX, turnTrackerY, 0);
+        AddNewUIElement(turnTrackerObject, new Vector2(turnTrackerX, turnTrackerY));
         yield return turnTrackerObject;
     }
 

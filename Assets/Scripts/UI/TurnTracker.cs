@@ -28,7 +28,7 @@ public class TurnTracker : MonoBehaviour
     }
 
     // Starts the next player's turn
-    void NextTurn()
+    private void NextTurn()
     {
         // Iterate the participant index
         currentParticipant++;
@@ -104,6 +104,7 @@ public class TurnTracker : MonoBehaviour
             Destroy(child.gameObject);
         }
 
+        // Add all participants in the scene to the turn order.
         foreach (Participant P in FindObjectsOfType<Participant>())
         {
             AddParticipant(P);
