@@ -26,6 +26,8 @@ public class Participant : MonoBehaviour
         StartCoroutine(FindObjectOfType<TurnTracker>().EndTurn());
     }
 
+    public virtual void Damage(float damage) { }
+
     public virtual void Update()
     {
         // We only want to run any update code if it's currently the player's turn.

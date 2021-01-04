@@ -17,9 +17,6 @@ public class MoveAction : Action
     // The participant's collider
     private Rigidbody2D participantCollider;
 
-    // A reference to the participant behaviour
-    private ActorParticipant actor;
-
     public override void Start()
     {
         base.Start();
@@ -27,7 +24,6 @@ public class MoveAction : Action
         // Get the current participant location
         participantPos = (Vector2)transform.position;
         participantCollider = gameObject.GetComponent<Rigidbody2D>();
-        actor = gameObject.GetComponent<ActorParticipant>();
 
         // Add a linerenderer object to the GameObject and set it up appropriately.
         InitLineRenderer();

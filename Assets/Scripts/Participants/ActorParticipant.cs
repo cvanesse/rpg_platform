@@ -39,13 +39,18 @@ public class ActorParticipant : Participant
         return resources;
     }
 
+    public override void Damage(float damage)
+    {
+        base.Damage(damage);
+        health.val -= damage;
+    }
+
     private void ClearActions()
     {
-        foreach (MonoBehaviour comp in actions)
+        foreach (Action comp in actions)
         {
             Destroy(comp);
         }
-        actions.Clear();
     }
 
     public override void StartTurn()
@@ -68,6 +73,11 @@ public class ActorParticipant : Participant
         base.EndTurn();
     }
 
+    public void RemoveAction(Action action)
+    {
+        actions.Remove(action);
+    }
+
     public override void Update()
     {
         base.Update();
@@ -84,6 +94,13 @@ public class ActorParticipant : Participant
                 else
                 {
                     gameObject.GetComponent<MoveAction>().StartMoving();
+                }
+            }
+            if (Input.GetKeyDown("a"))
+            {
+                if (!actions.OfType<AttackAction>().Any())
+                {
+                    actions.Add(gameObject.AddComponent<AttackAction>());
                 }
             }
         }
