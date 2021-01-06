@@ -5,7 +5,7 @@ using System;
 // A field-of-view mesh centered at an object.
 public class FovMesh : MonoBehaviour
 {
-    private Mesh mesh;
+    public Mesh mesh;
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
     private PolygonCollider2D meshCollider;
@@ -15,8 +15,6 @@ public class FovMesh : MonoBehaviour
     private float midAngle;
     private float fovDistance;
     private int rayCount;
-
-    private bool mouseIsInside; // This mouse detection functionality should be moved to a different object which inherits from this.
 
     // Gets a unit vector from an angle
     private Vector3 GetUnitVector(float angle)
@@ -31,14 +29,13 @@ public class FovMesh : MonoBehaviour
     {
         string[] layers = { "Wall" };
         layerMask = EnvironmentUtilities.GetLayerMaskFromNames(layers);
-        mouseIsInside = false;
 
         InitMeshComponents();
 
         SetVision(0f);
     }
 
-    public void SetVision(float fov_distance, float mid_angle = 0f, float fov_angle = 360f, int ray_count = 100)
+    public void SetVision(float fov_distance, float mid_angle = 0f, float fov_angle = 360f, int ray_count = 500)
     {
         fovDistance = fov_distance;
         fovAngle = fov_angle;
@@ -54,11 +51,6 @@ public class FovMesh : MonoBehaviour
         mesh.name = "FOV";
         meshFilter = gameObject.AddComponent<MeshFilter>();
         meshFilter.mesh = mesh;
-        meshCollider = gameObject.AddComponent<PolygonCollider2D>();
-        meshCollider.isTrigger = true;
-
-        var rb2D = gameObject.AddComponent<Rigidbody2D>();
-        rb2D.bodyType = RigidbodyType2D.Static;
 
         meshRenderer = gameObject.AddComponent<MeshRenderer>();
         meshRenderer.sortingLayerName = "UI_front";
@@ -104,26 +96,9 @@ public class FovMesh : MonoBehaviour
             angle -= angle_increase;
         }
 
-        meshCollider.points = Array.ConvertAll(vertices, item => (Vector2)item);
-
         mesh.vertices = vertices;
         mesh.uv = uv;
         mesh.triangles = triangles;
-    }
-
-    public bool GetMouseInside()
-    {
-        return mouseIsInside;
-    }
-
-    public void OnMouseEnter()
-    {
-        mouseIsInside = true;
-    }
-
-    public void OnMouseExit()
-    {
-        mouseIsInside = false;
     }
 
 }
