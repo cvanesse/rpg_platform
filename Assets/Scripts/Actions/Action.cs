@@ -1,19 +1,31 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// The action class handles creation and annihilation of components which can be created by an action
-//  ie - for rendering, other GUI elements, etc.
+/// <summary>
+/// A base class for Actions performed by an ActorParticipant.
+/// Handles creation, tracking, and cleanup of child gameObjects and Components.
+/// </summary>
 public class Action : MonoBehaviour
 {
-
-    // The list for tracking child behaviors for removing them on destruction
+    /// <summary>
+    /// The list for tracking child behaviours so they can be removed on destruction
+    /// </summary>
     private List<Component> childComponents;
 
-    // List for tracking child objects so we can remove them on desctruction
+    /// <summary>
+    /// The list for tracking child objects so they can be removed on destruction.
+    /// </summary>
     private List<GameObject> childObjects;
 
+    /// <summary>
+    /// A reference to the actor that started this action behaviour
+    /// </summary>
     protected ActorParticipant actor;
 
+    /// <summary>
+    /// On creation, the actor initializes the childComponents and childObjects lists,
+    /// and gets the reference to the actor.
+    /// </summary>
     public virtual void Start()
     {
         childComponents = new List<Component>();
@@ -22,6 +34,12 @@ public class Action : MonoBehaviour
     }
 
     // Adds a new component to the parent object, while tracking them in a list of behaviours for removal later.
+    /// <summary>
+    /// Adds a new component to the participant gameObject which created this action, 
+    /// and stores a reference to it in the list of child components.
+    /// </summary>
+    /// <typeparam name="T">The Monobehaviour type to create.</typeparam>
+    /// <returns>A reference to the new component</returns>
     protected T AddChildBehaviour<T>() where T : Component
     {
         var compRef = gameObject.AddComponent<T>();
@@ -29,11 +47,24 @@ public class Action : MonoBehaviour
         return compRef;
     }
 
+    /// <summary>
+    /// Adds an existing component to the list of children.
+    /// This is useful when components are added to other objects (like Target,)
+    /// but still need to be destroyed when the action ends.
+    /// </summary>
+    /// <param name="comp">A reference to the component which should be listed as a child.</param>
     protected void ListChildBehaviour(Component comp)
     {
         childComponents.Add(comp);
     }
 
+    /// <summary>
+    /// Instantiates a new gameObject using an Object/Prefab as reference as a child of the participant gameObject in the hierarchy,
+    /// and adds it to the list of child gameObjects so it can be destroyed on destruction
+    /// of the Action.
+    /// </summary>
+    /// <param name="obj">A reference to the object/prefab which should be instantiated</param>
+    /// <returns>A reference to the instantiated object.</returns>
     protected GameObject AddChildObject(UnityEngine.Object obj)
     {
         var objRef = (GameObject)Instantiate(obj, gameObject.transform);
@@ -41,6 +72,13 @@ public class Action : MonoBehaviour
         return objRef;
     }
 
+    /// <summary>
+    /// Instantiates a new empty gameObject with the given name as a child of the participant
+    /// in the hierarchy, and adds it to the list of child gameObjects so it can be destroyed
+    /// on destruction of the Action.
+    /// </summary>
+    /// <param name="obj_name">The name of the empty gameObject</param>
+    /// <returns>A reference to the instantiated object.</returns>
     protected GameObject AddChildObject(string obj_name)
     {
         var objRef = new GameObject(obj_name);
@@ -50,7 +88,13 @@ public class Action : MonoBehaviour
         return objRef;
     }
 
-    // Instantiate a new GameObject and keep track of it in the list of objects
+    /// <summary>
+    /// Instantiates a clone of an existing GameObject as a child of the participant object,
+    /// and adds it to the list of child gameObjects so it can be destroyed on destruction
+    /// of the Action 
+    /// </summary>
+    /// <param name="obj">A reference to the gameObject to clone</param>
+    /// <returns>A reference to the new gameObject</returns>
     protected GameObject AddChildObject(GameObject obj)
     {
         var objRef = Instantiate(obj, gameObject.transform);
@@ -58,6 +102,14 @@ public class Action : MonoBehaviour
         return objRef;
     }
 
+    /// <summary>
+    /// On destruction, Actions need to be removed from the list of Actions
+    /// in the ActorParticipant Behaviour, and all of their children need to be destroyed.
+    /// This loops through all of the child objects and destroys all children, and
+    /// tells the actor to remove this Action from it's list
+    /// 
+    /// TODO: Avoid actor.RemoveAction(this) callback - it's ugly.
+    /// </summary>
     public virtual void OnDestroy()
     {
         actor.RemoveAction(this);
@@ -71,5 +123,4 @@ public class Action : MonoBehaviour
             Destroy(obj);
         }
     }
-
 }
