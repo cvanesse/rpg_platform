@@ -1,40 +1,84 @@
 using UnityEngine;
-using System.Linq;
-using System;
 
-// A field-of-view mesh centered at an object.
+/// <summary>
+/// A field-of-view/range mesh centered on an object. 
+/// </summary>
 public class FovMesh : MonoBehaviour
 {
+    /// <summary>
+    /// The mesh used by the FovMesh
+    /// </summary>
     public Mesh mesh;
-    private MeshFilter meshFilter;
-    private MeshRenderer meshRenderer;
-    private PolygonCollider2D meshCollider;
 
+    /// <summary>
+    /// The MeshFilter used for rendering
+    /// </summary>
+    private MeshFilter meshFilter;
+
+    /// <summary>
+    /// The MeshRenderer
+    /// </summary>
+    private MeshRenderer meshRenderer;
+
+    /// <summary>
+    /// The layerMask for "vision" - should collide with walls and opaque objects, but not entities.
+    /// </summary>
     private int layerMask;
+
+    /// <summary>
+    /// The angle of vision to use.
+    /// </summary>
     private float fovAngle;
+
+    /// <summary>
+    /// The center of the FOV.
+    /// </summary>
     private float midAngle;
+
+    /// <summary>
+    /// The range of the FOV. 
+    /// </summary>
     private float fovDistance;
+
+    /// <summary>
+    /// The number of rays to trace for rendering the FOV mesh. 
+    /// </summary>
     private int rayCount;
 
     // Gets a unit vector from an angle
-    private Vector3 GetUnitVector(float angle)
+    /// <summary>
+    /// Gets a unit vector from an angle (in degrees.)
+    /// </summary>
+    /// <param name="angle">The angle of the unit vector. </param>
+    /// <returns>A unit vector pointing along the angle. </returns>
+    private Vector2 GetUnitVector(float angle)
     {
         angle = angle * (Mathf.PI / 180f); // Convert to radians
         float x = Mathf.Sin(angle);
         float y = Mathf.Cos(angle);
-        return new Vector3(x, y);
+        return new Vector2(x, y);
     }
 
+    /// <summary>
+    /// On awake, the meshes initializes and vision length is set to 0 - and the layerMask of the FovMesh is set appropriately.
+    /// </summary>
     private void Awake()
     {
         string[] layers = { "Wall" };
         layerMask = EnvironmentUtilities.GetLayerMaskFromNames(layers);
-
+        
         InitMeshComponents();
 
         SetVision(0f);
     }
 
+    /// <summary>
+    /// Updates the FOV mesh based on the given distance, angle center and range, and ray count. 
+    /// </summary>
+    /// <param name="fov_distance">The radius of the FOV mesh</param>
+    /// <param name="mid_angle">The center angle of the FOV</param>
+    /// <param name="fov_angle">The angle range of the FOV</param>
+    /// <param name="ray_count">The number of rays to use for rendering the mesh. </param>
     public void SetVision(float fov_distance, float mid_angle = 0f, float fov_angle = 360f, int ray_count = 500)
     {
         fovDistance = fov_distance;
@@ -44,7 +88,9 @@ public class FovMesh : MonoBehaviour
         UpdateFOV();
     }
 
-    // Initializes a meshfilter an meshrenderer on the object
+    /// <summary>
+    /// Initializes the meshfilter and meshrenderer for the object.
+    /// </summary>
     private void InitMeshComponents()
     {
         mesh = new Mesh();
@@ -57,10 +103,11 @@ public class FovMesh : MonoBehaviour
         meshRenderer.material = Resources.Load("Materials/Alpha_Mask", typeof(Material)) as Material;
     }
 
+    /// <summary>
+    /// Performs the raytracing algorithm to update the FovMesh.
+    /// </summary>
     private void UpdateFOV()
     {
-        // Field of view if 360 degrees to start.
-        //Vector3 origin = gameObject.transform.position;
         Vector3 origin = Vector3.zero;
         float angle = midAngle - fovAngle / 2;
         float angle_increase = fovAngle / rayCount;
@@ -100,5 +147,4 @@ public class FovMesh : MonoBehaviour
         mesh.uv = uv;
         mesh.triangles = triangles;
     }
-
 }
