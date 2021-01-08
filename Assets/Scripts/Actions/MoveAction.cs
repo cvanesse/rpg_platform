@@ -1,17 +1,28 @@
 using UnityEngine;
 
-// The mover behavior is intended to be added to an object when the player decides to move the character
-// (Ie - takes the move action)
+/// <summary>
+/// The behaviour associated with players taking a move action.
+/// </summary>
 public class MoveAction : Action
 {
-    private LineRenderer lineRend; // The linerendering object for showing the player -> mouseptr line.
-    private GameObject ghost; // The UI Ghost for showing player destination.
+    /// <summary>
+    /// The linerendering object for showing the player -> mouseptr line.
+    /// </summary>
+    private LineRenderer lineRend;
 
-    // The mouse and participant locations.
-    private Vector2 mousePos;
+    /// <summary>
+    /// The ghost object for showing the player destination.
+    /// </summary>
+    private GameObject ghost;
+
+    /// <summary>
+    /// A reference to the player position, for cleaner use throughout the script.
+    /// </summary>
     private Vector2 participantPos;
 
-    // The participant's collider
+    /// <summary>
+    /// A reference to the participant's collider.
+    /// </summary>
     private Rigidbody2D participantCollider;
 
     public override void Start()
@@ -29,6 +40,9 @@ public class MoveAction : Action
         InitUIGhost();
     }
 
+    /// <summary>
+    /// The MoveAction needs to reset actor.stamina.dx to zero when it's destroyed.
+    /// </summary>
     public override void OnDestroy()
     {
         base.OnDestroy();
@@ -37,11 +51,10 @@ public class MoveAction : Action
 
     public void Update()
     {
-        // Get the current mouse position
-        mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
         // Get the appropriate move position and update the GUI based on it.
-        Vector2 movePos = FindMovePos(mousePos);
+        Vector2 movePos = FindMovePos(
+            (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition)
+        );
 
         lineRend.SetPosition(1, movePos);
         actor.stamina.dx = Vector2.Distance(movePos, participantPos);
@@ -54,7 +67,9 @@ public class MoveAction : Action
         }
     }
 
-    // Initialize a UI_ghost for placing at the destination
+    /// <summary>
+    /// Creates the UI Ghost of the participant and initializes it to show the actor destination.
+    /// </summary>
     private void InitUIGhost()
     {
         // Create the UI Ghost game object
@@ -65,7 +80,9 @@ public class MoveAction : Action
         ghost.GetComponent<UI_ghost>().SetActor(actor);
     }
 
-    // Initializes the line renderer for movement feedback.
+    /// <summary>
+    /// Creates and initializes the line renderer to show the actor destination.
+    /// </summary>
     private void InitLineRenderer()
     {
         lineRend = AddChildBehaviour<LineRenderer>();
@@ -78,7 +95,12 @@ public class MoveAction : Action
         lineRend.SetPosition(0, participantPos);
     }
 
-    // Finds the movement destination based on mouse position
+    /// <summary>
+    /// Gets the movement destination based on the mouse position. This will return either the maximum move distance based on AP/stamina
+    /// and the mouse position, the maximum distance moveable based on any collisions with the environment, or the mouse position itself.
+    /// </summary>
+    /// <param name="mousePos">The current mouse position</param>
+    /// <returns>The actor destination based on the current mouse position.</returns>
     private Vector2 FindMovePos(Vector2 mousePos)
     {
         // Create a ray pointing from the participant to the mouse
@@ -138,6 +160,10 @@ public class MoveAction : Action
     }
 
     // Moves the participant to a new location.
+    /// <summary>
+    /// Moves the participant to a destination, updates the actor stamina based on that movement, and finished the move action.
+    /// </summary>
+    /// <param name="destination">The destination of the actor.</param>
     private void MoveParticipant(Vector2 destination)
     {
         transform.position = destination;

@@ -34,10 +34,6 @@ public class AttackAction : Action
         InitRange();
     }
 
-    public void Update()
-    {
-    }
-
     public override void OnDestroy()
     {
         base.OnDestroy();

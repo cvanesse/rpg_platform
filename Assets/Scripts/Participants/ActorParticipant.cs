@@ -21,6 +21,11 @@ public class ActorParticipant : Participant
     private List<Type> availableActions;
 
     /// <summary>
+    /// For holding the input string at every frame (to parse for control.)
+    /// </summary>
+    private String inputString;
+
+    /// <summary>
     /// Flag - set to true if the actor is currently in the middle of an action - false otherwise.
     /// </summary>
     private bool isActing;
@@ -66,7 +71,7 @@ public class ActorParticipant : Participant
     private void LoadActions() {
         // Currently a placeholder - eventually there should be a reference to some serialized data with player information.
         
-        // Right now these are my only available actions - basic actions like Move, Dodge, etc... should not use the generalized 1-0 action number system
+        // Right now these are my only available actions - basic actions like Move, Dodge, etc... should not use up the player's hotbar (which is easily implemented using keys 1-0)
         // Since that unnecessarily takes up action real estate in the player's hotbar. 
         // IE - Move should have a dedicated control.
         availableActions.Add(typeof(MoveAction));
@@ -152,20 +157,24 @@ public class ActorParticipant : Participant
 
         if (!isTurn) {return;}
 
-        // We don't listen if it's not our turn.
+        // If there's no current actions - listen for player input and start the appropriate actions. Otherwise, listen for a cancel request from the player.
         if (!isActing)
         {
             // Check for basic/common action inputs.
             // 'p' is the primary action, 'm' is move, and 1-0 are the player's minor action hotbar.
 
-            // Check for general action inputs.
+            inputString = Input.inputString;
+
+            // Check if the key is in the hotbar (numeric keys) to start, otherwise check the hardcoded controls for basic actions.
             try {
-                int inputID = Int32.Parse(Input.inputString);
+                int inputID = Int32.Parse(inputString);
                 if (inputID == 0) {inputID = 10;}
                 if (inputID <= availableActions.Count) {
                     StartAction(availableActions[inputID - 1]);
                 }
-            } catch { } // No Catch for now.
+            } catch {
+                // TODO: Preset key-controls for basic actions.
+            }
         }else  {
             if (Input.GetKeyDown("escape") || Input.GetMouseButton(1)) {
                 // Destroy the current action

@@ -3,15 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+/// <summary>
+/// Takes care of tracking the turn order for participants. Tells actors when it's their turn, and listens for when they're done.
+/// </summary>
 public class TurnTracker : MonoBehaviour
-{
-    // Contains the list of participants in the tracker
+{   
+    /// <summary>
+    /// The list of participants in the tracker
+    /// </summary>
     private List<Participant> participants;
 
-    // A list containing references participant name text components
+    /// <summary>
+    /// A list containing references to the participant nameplates in the turnorder GUI.
+    /// </summary>
     private List<Text> participantNames = new List<Text>();
 
-    // Contains the index of the current participant.
+    /// <summary>
+    /// An integer containing the ID of the current participant in the 'participants' list.
+    /// </summary>
     private int currentParticipant;
 
     void Start()
@@ -26,7 +35,9 @@ public class TurnTracker : MonoBehaviour
         NextTurn();
     }
 
-    // Starts the next player's turn
+    /// <summary>
+    /// Starts the next player's turn
+    /// </summary>
     private void NextTurn()
     {
         // Iterate the participant index
@@ -40,7 +51,9 @@ public class TurnTracker : MonoBehaviour
         participants[currentParticipant].StartTurn();
     }
 
-    // Ends the current participants turn and moves to the next participant
+    /// <summary>
+    /// Used as a callback function by participants to advance the turnorder.
+    /// </summary>
     public IEnumerator EndTurn()
     {
         yield return new WaitForFixedUpdate();
@@ -48,7 +61,10 @@ public class TurnTracker : MonoBehaviour
         NextTurn();
     }
 
-    // Adds a nameplate to the TurnTracker for a given actor
+    /// <summary>
+    /// Adds a participant to the list of participants.
+    /// </summary>
+    /// <param name="participant">A reference to the participant to add to the turnorder</param>
     private void AddParticipant(Participant participant)
     {
         float nameheight = 15f;
@@ -66,12 +82,17 @@ public class TurnTracker : MonoBehaviour
         participantNames.Add(nameplate);
         int pid = participants.Count - 1;
 
+        // Update the callback function of the target for ending the turn.
+        participant.SetEndTurnCallback(EndTurn);
+
         // Update the nameplate position based on location in turnorder
         float y_coord = -((float)pid + 0.5f) * nameheight + pid * namedist;
         nameplate_tfm.anchoredPosition = new Vector3(0, y_coord, 0);
     }
 
-    // Initializes the TurnTracker GUI
+    /// <summary>
+    /// Initializes the TurnTracker GUI
+    /// </summary>
     void InitTurnTracker()
     {
         // Clear any existing GameObjects in the canvas
