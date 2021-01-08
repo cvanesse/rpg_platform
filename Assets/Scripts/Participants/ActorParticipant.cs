@@ -1,20 +1,42 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 // The actor participant handles creation and annihilation of action components on the actor gameObject
+/// <summary>
+/// The ActorParticipant is a behaviour attached to participants in combat who perform player-controlled actions.
+/// This class listens to player input and creates/destroys action objects when the player wants to start/cancal an action
+/// </summary>
 public class ActorParticipant : Participant
 {
+    /// <summary>
+    /// Holds a reference to the current Action so that it can be destroyed on the end of the turn.
+    /// </summary>
+    private Action currentAction;
 
-    // Holds a list of actionComponents created on the turn so that they can be removed at the end of the turn.
-    private List<Action> actions;
+    /// <summary>
+    /// Holds the list of available actions for this actor.
+    /// </summary>
+    private List<Type> availableActions;
 
-    // Stamina and health information
+    /// <summary>
+    /// Flag - set to true if the actor is currently in the middle of an action - false otherwise.
+    /// </summary>
+    private bool isActing;
+
+    /// <summary>
+    /// Stamina information for the actor.
+    /// </summary>
     public ContinuousResource stamina;
     public Color staminaColor;
     public float maxStamina;
     public float staminaBarX;
     public float staminaBarY;
+
+    /// <summary>
+    /// Health information for the actor.
+    /// </summary>
     public ContinuousResource health;
     public Color healthColor;
     public float maxHealth;
@@ -22,15 +44,39 @@ public class ActorParticipant : Participant
     public float healthBarY;
 
     // Inheritance requires that we use the override keyword for extensions of base classes.
+    /// <summary>
+    /// Initializes the health and stamina of the actor - eventually should load the stats and available actions from saved player information.
+    /// </summary>
     public override void Start()
     {
         base.Start();
-        actions = new List<Action>();
+
+        availableActions = new List<Type>();
+        LoadActions();
+
+        isActing = false;
 
         stamina = new ContinuousResource("Stamina", maxStamina, staminaColor, new Vector2(staminaBarX, staminaBarY));
         health = new ContinuousResource("Health", maxHealth, healthColor, new Vector2(healthBarX, healthBarY));
     }
 
+    /// <summary>
+    /// Loads the list of available actions from saved character information.
+    /// </summary>
+    private void LoadActions() {
+        // Currently a placeholder - eventually there should be a reference to some serialized data with player information.
+        
+        // Right now these are my only available actions - basic actions like Move, Dodge, etc... should not use the generalized 1-0 action number system
+        // Since that unnecessarily takes up action real estate in the player's hotbar. 
+        // IE - Move should have a dedicated control.
+        availableActions.Add(typeof(MoveAction));
+        availableActions.Add(typeof(AttackAction));
+    }
+
+    /// <summary>
+    /// Gets a list of the resources available to this actor, for updating the GUI.
+    /// </summary>
+    /// <returns>A list containing all of the resources available to the actor.</returns>
     public List<Resource> GetResourceList()
     {
         List<Resource> resources = new List<Resource>();
@@ -39,69 +85,91 @@ public class ActorParticipant : Participant
         return resources;
     }
 
+    /// <summary>
+    /// Does damage to the actor.
+    /// </summary>
+    /// <param name="damage">The amount of damage to do.</param>
     public override void Damage(float damage)
     {
         base.Damage(damage);
         health.val -= damage;
     }
 
-    private void ClearActions()
-    {
-        foreach (Action comp in actions)
-        {
-            Destroy(comp);
-        }
-    }
 
+    /// <summary>
+    /// Starts the turn of this Actor - the Participant base class handles setting the isTurn flag, 
+    /// this class handles resetting the available action points/stamins of the actor. Furthermore, this
+    /// tells the ActorGUI that this actor's turn has started.
+    /// 
+    /// TODO: Try and remove the callback to the ActorGUI - this is ugly - and shouldn't be handled by this class.
+    /// </summary>
     public override void StartTurn()
     {
         base.StartTurn();
 
-        stamina.val = stamina.maxVal;
+        stamina.val = stamina.maxVal; // Reset the AP/Stamina of the actor.
 
         // Update the actor GUI
         FindObjectOfType<ActorGUI>().SetCurrentActor(this);
     }
 
+    /// <summary>
+    /// Ends the turn for this actor.
+    /// </summary>
     protected override void EndTurn()
     {
-        ClearActions();
-
         // Update the actor GUI
         FindObjectOfType<ActorGUI>().ClearActor();
 
         base.EndTurn();
     }
 
-    public void RemoveAction(Action action)
-    {
-        actions.Remove(action);
+    /// <summary>
+    /// Called by actions if they are completed successfully (ie - not cancelled by the player.)
+    /// </summary>
+    public void EndAction() {
+        Destroy(currentAction);
+        isActing = false;
     }
 
+    /// <summary>
+    /// Called when starting a new action
+    /// </summary>
+    /// <param name="actionType">The action type to start.</param>
+    private void StartAction(Type actionType) {
+        currentAction = gameObject.AddComponent(actionType) as Action;
+        isActing = true;
+    }
+
+    /// <summary>
+    /// Listens for player input, and creates/cancels actions by adding/removing action components.
+    /// 
+    /// TODO: Change the control listening to use GetButton instead of GetKey.
+    /// </summary>
     public override void Update()
     {
         base.Update();
 
-        if (isTurn)
+        if (!isTurn) {return;}
+
+        // We don't listen if it's not our turn.
+        if (!isActing)
         {
-            if (Input.GetKeyDown("m"))
-            {
-                // Add the mover component and track it in the list of action components, if it doesn't exist already.
-                if (!actions.OfType<MoveAction>().Any())
-                {
-                    actions.Add(gameObject.AddComponent<MoveAction>());
+            // Check for basic/common action inputs.
+            // 'p' is the primary action, 'm' is move, and 1-0 are the player's minor action hotbar.
+
+            // Check for general action inputs.
+            try {
+                int inputID = Int32.Parse(Input.inputString);
+                if (inputID == 0) {inputID = 10;}
+                if (inputID <= availableActions.Count) {
+                    StartAction(availableActions[inputID - 1]);
                 }
-                else
-                {
-                    gameObject.GetComponent<MoveAction>().StartMoving();
-                }
-            }
-            if (Input.GetKeyDown("a"))
-            {
-                if (!actions.OfType<AttackAction>().Any())
-                {
-                    actions.Add(gameObject.AddComponent<AttackAction>());
-                }
+            } catch { } // No Catch for now.
+        }else  {
+            if (Input.GetKeyDown("escape") || Input.GetMouseButton(1)) {
+                // Destroy the current action
+                EndAction();
             }
         }
     }

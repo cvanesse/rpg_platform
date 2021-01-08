@@ -33,7 +33,6 @@ public class Action : MonoBehaviour
         actor = gameObject.GetComponent<ActorParticipant>();
     }
 
-    // Adds a new component to the parent object, while tracking them in a list of behaviours for removal later.
     /// <summary>
     /// Adds a new component to the participant gameObject which created this action, 
     /// and stores a reference to it in the list of child components.
@@ -103,17 +102,20 @@ public class Action : MonoBehaviour
     }
 
     /// <summary>
+    /// Best practice: Objects should never destroy themselves.
+    /// When actions are completed - they need to tell the actor that they are done, and the actor can update their tracking and destroy the action.
+    /// </summary>
+    protected void FinishAction() {
+        actor.EndAction();
+    }
+
+    /// <summary>
     /// On destruction, Actions need to be removed from the list of Actions
     /// in the ActorParticipant Behaviour, and all of their children need to be destroyed.
-    /// This loops through all of the child objects and destroys all children, and
-    /// tells the actor to remove this Action from it's list
-    /// 
-    /// TODO: Avoid actor.RemoveAction(this) callback - it's ugly.
+    /// This loops through all of the child objects and destroys all children.
     /// </summary>
     public virtual void OnDestroy()
     {
-        actor.RemoveAction(this);
-
         foreach (Component comp in childComponents)
         {
             Destroy(comp);

@@ -18,14 +18,19 @@ public class ContinuousResource : Resource
     private Color barColor;
     public Vector2 barPos;
 
-    public ContinuousResource(string name, float max_val, Color bar_color, Vector2 bar_pos, float val = -1)
+    public ContinuousResource(string name, float max_val, Color bar_color, Vector2 bar_pos)
     {
         this.resourceName = name;
         this.maxVal = max_val;
+        this.val = max_val;
+        this.barColor = bar_color;
+        this.barPos = bar_pos;
+    }
 
-        if (val >= 0) { this.val = val; }
-        else { this.val = max_val; }
-
+    public ContinuousResource(string name, float max_val, Color bar_color, Vector2 bar_pos, float val) {
+        this.resourceName = name;
+        this.maxVal = max_val;
+        this.val = val;
         this.barColor = bar_color;
         this.barPos = bar_pos;
     }

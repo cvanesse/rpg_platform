@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class TurnTracker : MonoBehaviour
 {
     // Contains the list of participants in the tracker
-    // private List<Participant> participants;
     private List<Participant> participants;
 
     // A list containing references participant name text components

@@ -7,9 +7,6 @@ public class MoveAction : Action
     private LineRenderer lineRend; // The linerendering object for showing the player -> mouseptr line.
     private GameObject ghost; // The UI Ghost for showing player destination.
 
-    // True when we should have the movement UI active.
-    private bool isMoving;
-
     // The mouse and participant locations.
     private Vector2 mousePos;
     private Vector2 participantPos;
@@ -30,44 +27,31 @@ public class MoveAction : Action
 
         // Add a UI ghost for the destination.
         InitUIGhost();
-
-        // Start the movement feedback GUI
-        StartMoving();
-    }
-
-    public void Update()
-    {
-        // If we're currently listening to user input
-        if (isMoving)
-        {
-            // Get the current mouse position
-            mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            // Get the appropriate move position and update the GUI based on it.
-            Vector2 movePos = FindMovePos(mousePos);
-
-            lineRend.SetPosition(1, movePos);
-            actor.stamina.dx = Vector2.Distance(movePos, participantPos);
-            ghost.transform.position = movePos;
-
-            // Is the user right-clicks, or presses escape, then cancel the movement.
-            if (Input.GetKeyDown("escape") || Input.GetMouseButtonDown(1))
-            {
-                StopMoving();
-            }
-
-            // Left click moves the participant to the new location
-            if (Input.GetMouseButton(0))
-            {
-                MoveParticipant(movePos);
-            }
-        }
     }
 
     public override void OnDestroy()
     {
-        StopMoving();
         base.OnDestroy();
+        actor.stamina.dx = 0;
+    }
+
+    public void Update()
+    {
+        // Get the current mouse position
+        mousePos = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        // Get the appropriate move position and update the GUI based on it.
+        Vector2 movePos = FindMovePos(mousePos);
+
+        lineRend.SetPosition(1, movePos);
+        actor.stamina.dx = Vector2.Distance(movePos, participantPos);
+        ghost.transform.position = movePos;
+
+        // Left click moves the participant to the new location
+        if (Input.GetMouseButton(0))
+        {
+            MoveParticipant(movePos);
+        }
     }
 
     // Initialize a UI_ghost for placing at the destination
@@ -88,28 +72,10 @@ public class MoveAction : Action
         lineRend.material = new Material(Shader.Find("Sprites/Default"));
         lineRend.startWidth = 0.1f;
         lineRend.startColor = Color.clear;
+        lineRend.endColor = Color.white;
         lineRend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         lineRend.sortingLayerName = "UI_front";
         lineRend.SetPosition(0, participantPos);
-    }
-
-    // Start the movement GUI and updates.
-    public void StartMoving()
-    {
-        isMoving = true;
-        ghost.SetActive(true);
-        //Cursor.visible = false;
-        lineRend.endColor = Color.white;
-    }
-
-    // Stop the movement GUI and updates.
-    private void StopMoving()
-    {
-        isMoving = false;
-        ghost.SetActive(false);
-        //Cursor.visible = true;
-        lineRend.endColor = Color.clear;
-        actor.stamina.dx = 0;
     }
 
     // Finds the movement destination based on mouse position
@@ -180,7 +146,7 @@ public class MoveAction : Action
         participantPos = (Vector2)transform.position;
         lineRend.SetPosition(0, participantPos);
 
-        StopMoving();
+        FinishAction();
     }
 
 }

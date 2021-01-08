@@ -26,7 +26,7 @@ public class AttackAction : Action
         if (actor.stamina.val < staminaVal)
         {
             // Not enough stamina for attack - add sound effect for failure.
-            Destroy(this);
+            FinishAction();
             return;
         }
 
@@ -36,14 +36,6 @@ public class AttackAction : Action
 
     public void Update()
     {
-        // Unlike the move action, we don't need to know when the player is using or not using the attack action
-        //  If they are using it, this object exists - otherwise it doesn't.
-
-        // Escape or right click ends the action.
-        if (Input.GetMouseButton(1) || Input.GetKey("escape"))
-        {
-            Destroy(this);
-        }
     }
 
     public override void OnDestroy()
@@ -102,8 +94,7 @@ public class AttackAction : Action
 
         actor.stamina.val -= staminaVal;
 
-        Destroy(this);
+        // The action is over once we've done damage.
+        FinishAction();
     }
-
-
 }
